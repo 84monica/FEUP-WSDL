@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.db.models import Count
 from .models import Recipe
+import ast
 
 # Create your views here.´
 
@@ -21,14 +22,28 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 def country_recipes(request, country):
-    template = loader.get_template("polls/recipes.html")
+    template = loader.get_template("polls/recipeList.html")
     context = {
         "recipes": Recipe.objects.filter(country_of_origin=country),
     }
     return HttpResponse(template.render(context, request))
 
+def recipe_detail(request, name):
+    template = loader.get_template("polls/recipeDetail.html")
+
+    recipe = Recipe.objects.get(name=name)
+
+    #  Convert ingredients from string to list
+    recipe.ingredients = ast.literal_eval(recipe.ingredients)
+
+    context = {
+        "recipe": recipe,
+    }
+
+    return HttpResponse(template.render(context, request))
+
 def recipe_list(request):
-    template = loader.get_template("polls/recipes.html")
+    template = loader.get_template("polls/recipeList.html")
     context = {
         "recipes": Recipe.objects.all(),
     }

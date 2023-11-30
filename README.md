@@ -6,6 +6,8 @@
 python3 manage.py runserver
 ```
 
+HomePage is at /polls
+
 ## Populate Model
 
 ```
