@@ -6,7 +6,7 @@ from .models import Recipe
 # Create your views here.´
 
 def index(request):
-    template = loader.get_template("polls/countries.html")
+    template = loader.get_template("polls/homePage.html")
 
     # Query to get the count of recipes for each country
     countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))

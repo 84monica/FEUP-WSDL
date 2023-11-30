@@ -3,6 +3,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from django.core.management.base import BaseCommand
 from polls.models import Recipe
 
+
 class Command(BaseCommand):
     help = 'Populate recipes'
 
@@ -15,9 +16,11 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('Successfully populated recipes'))
 
+
 def delete_all():
     # Delete all recipes
     Recipe.objects.all().delete()
+
 
 def dbpedia():
     # Query for all dishes and their country of origin
@@ -26,16 +29,21 @@ def dbpedia():
     sparql.setQuery("""
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX dbo: <http://dbpedia.org/ontology/>
-        SELECT ?name ?countryLabel
+        SELECT ?name ?countryLabel (GROUP_CONCAT(?ingredientLabel; SEPARATOR=", ") AS ?ingredients) ?abstract
         WHERE {
             ?dish rdf:type dbo:Food ;
                 rdfs:label ?name ;
-                dbo:country ?country.
+                dbo:country ?country;
+                dbo:ingredient ?ingredient;
+                dbo:abstract ?abstract.
             ?country rdfs:label ?countryLabel.
+            ?ingredient rdfs:label ?ingredientLabel.
             FILTER(LANG(?name) = "en")
             FILTER(LANG(?countryLabel) = "en")
-        }
-        """)
+            FILTER(LANG(?ingredientLabel) = "en")
+            FILTER(LANG(?abstract) = "en")
+        } GROUP BY ?dish ?name ?countryLabel ?abstract
+    """)
 
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
@@ -43,7 +51,9 @@ def dbpedia():
     for result in results["results"]["bindings"]:
         Recipe.objects.create(
             name=result["name"]["value"],
-            country_of_origin=result["countryLabel"]["value"]
+            country_of_origin=result["countryLabel"]["value"],
+            ingredients=result["ingredients"]["value"].split(", "),
+            abstract=result["abstract"]["value"]
         )
 
 def foodDB():
@@ -64,7 +74,7 @@ def foodDB():
 
         # print(ret)
 
-        for r in ret["results"]["bindings"]: # TODO: Write to Models
+        for r in ret["results"]["bindings"]:  # TODO: Write to Models
             print(r)
 
     except Exception as e:
