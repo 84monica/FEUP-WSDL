@@ -23,9 +23,14 @@ def index(request):
 
 def country_recipes(request, country):
     template = loader.get_template("polls/recipeList.html")
+
+    # Sort recipes alphabetically
+    sorted_recipes = sorted(Recipe.objects.filter(country_of_origin=country), key=lambda x: x.name)
+    
     context = {
-        "recipes": Recipe.objects.filter(country_of_origin=country),
+        "recipes": sorted_recipes,
     }
+
     return HttpResponse(template.render(context, request))
 
 def recipe_detail(request, id):
@@ -44,7 +49,12 @@ def recipe_detail(request, id):
 
 def recipe_list(request):
     template = loader.get_template("polls/recipeList.html")
+
+    # Sort recipes alphabetically
+    sorted_recipes = sorted(Recipe.objects.all(), key=lambda x: x.name)
+
     context = {
-        "recipes": Recipe.objects.all(),
+        "recipes": sorted_recipes,
     }
+    
     return HttpResponse(template.render(context, request))
