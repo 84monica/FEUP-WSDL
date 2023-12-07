@@ -136,7 +136,7 @@
     </div>
     
     {% for recipe in recipes %}
-        <form action="{% url 'recipe_detail' name=recipe.name %}" method="get">
+        <form action="{% url 'recipe_detail' id=recipe.id %}" method="get">
             <div class="recipe-card">
                 <div class="recipe-name">
                     {{ recipe.name }}

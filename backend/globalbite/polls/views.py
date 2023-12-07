@@ -28,10 +28,10 @@ def country_recipes(request, country):
     }
     return HttpResponse(template.render(context, request))
 
-def recipe_detail(request, name):
+def recipe_detail(request, id):
     template = loader.get_template("polls/recipeDetail.html")
 
-    recipe = Recipe.objects.get(name=name)
+    recipe = Recipe.objects.get(id=id)
 
     #  Convert ingredients from string to list
     recipe.ingredients = ast.literal_eval(recipe.ingredients)
