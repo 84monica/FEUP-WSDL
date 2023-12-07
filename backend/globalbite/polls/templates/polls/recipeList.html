@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,7 +82,8 @@
             justify-content: space-between;
             align-items: center;
             transition: transform 0.3s ease-in-out;
-            cursor: pointer; /* Add cursor:pointer for better indication */
+            cursor: pointer;
+            /* Add cursor:pointer for better indication */
         }
 
         .recipe-card:hover {
@@ -113,8 +115,14 @@
             cursor: pointer;
             font-size: 14px;
         }
+
+        .recipe-card-link {
+            text-decoration: none;
+            color: inherit; /* Use the same color as the parent element */
+        }
     </style>
 </head>
+
 <body>
     <h1>Results</h1>
 
@@ -133,19 +141,21 @@
             <option value="alphabetical">Alphabetical</option>
         </select>
     </div>
-    
+
     {% for recipe in recipes %}
-        <form action="{% url 'recipe_detail' id=recipe.id %}" method="get">
-            <div class="recipe-card">
-                <div class="recipe-name">
-                    {{ recipe.name }}
-                    <div class="recipe-ingredients">Originally from: {{ recipe.country_of_origin }}</div>
-                </div>
-                <div class="button-container">
-                    <button type="submit">View Details</button>
-                </div>
+    <a href="{% url 'recipe_detail' id=recipe.id %}" class="recipe-card-link">
+        <div class="recipe-card">
+            <div class="recipe-name">
+                {{ recipe.name }}
+                <div class="recipe-ingredients">Originally from: {{ recipe.country_of_origin }}</div>
             </div>
-        </form>
+            <div class="button-container">
+                <button type="button">View Details</button>
+            </div>
+        </div>
+    </a>
     {% endfor %}
+
 </body>
+
 </html>
