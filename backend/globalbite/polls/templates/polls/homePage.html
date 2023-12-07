@@ -108,7 +108,7 @@
     </style>
 </head>
 <body>
-    <h1>Home Page</h1>
+    <h1>Global Bite</h1>
 
     <!-- Search Bar -->
     <div class="search-bar">
@@ -120,12 +120,15 @@
 
     <!-- Order Dropdown -->
     <div class="order-dropdown">
-        <label for="order">Order by:</label>
-        <select id="order" name="order">
-            <option value="popularity">Popularity</option>
-            <option value="alphabetical">Alphabetical</option>
-        </select>
+        <form action="{% url 'index' %}" method="get">
+            <label for="order">Order by:</label>
+            <select id="order" name="order" onchange="this.form.submit()">
+                <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
+                <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
+            </select>
+        </form>
     </div>
+    
 
     <!-- Country Cards -->
     <div class="country-cards">

@@ -9,14 +9,26 @@ import ast
 def index(request):
     template = loader.get_template("polls/homePage.html")
 
-    # Query to get the count of recipes for each country
-    countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
+    order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
+    print(order_by)
 
-    # Sort countries in descending order based on recipe count
-    sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
+    if order_by == 'alphabetical':
+        # Query to get the count of recipes for each country
+        countries = Recipe.objects.values('country_of_origin')
+
+        # Sort countries in alphabetical order
+        sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
+        
+    elif order_by == 'popularity':
+        # Query to get the count of recipes for each country
+        countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
+
+        # Sort countries in descending order based on recipe count
+        sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
 
     context = {
         "countries": [country['country_of_origin'] for country in sorted_countries],
+        "order_by": order_by,
     }
 
     return HttpResponse(template.render(context, request))
@@ -56,5 +68,5 @@ def recipe_list(request):
     context = {
         "recipes": sorted_recipes,
     }
-    
+
     return HttpResponse(template.render(context, request))
