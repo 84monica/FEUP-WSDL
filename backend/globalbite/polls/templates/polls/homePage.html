@@ -113,8 +113,8 @@
     <!-- Search Bar -->
     <div class="search-bar">
         <div class="search-container">
-            <form action="{% url 'index' %}" method="get">
-                <input type="text" class="search-input" name="search" placeholder="Search for recipes...">
+            <form action="{% url 'search' %}" method="get">
+                <input type="text" class="search-input" name="query" placeholder="Search for recipes...">
                 <button type="submit" class="search-button">Search</button>
             </form>
         </div>

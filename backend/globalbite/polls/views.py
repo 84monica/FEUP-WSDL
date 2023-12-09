@@ -8,38 +8,26 @@ import ast
 
 def index(request):
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
-    search_recipe = request.GET.get('search')
+    template = loader.get_template("polls/homePage.html")
 
-    if search_recipe:
-        template = loader.get_template("polls/recipeList.html")
+    if order_by == 'alphabetical':
+        # Query to get the count of recipes for each country
+        countries = Recipe.objects.values('country_of_origin')
+
+        # Sort countries in alphabetical order
+        sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
         
-        recipes = Recipe.objects.filter(Q(name__icontains=search_recipe))
-        context = {
-            "recipes": recipes,
-        }
+    elif order_by == 'popularity':
+        # Query to get the count of recipes for each country
+        countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
 
-    else:
+        # Sort countries in descending order based on recipe count
+        sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
 
-        template = loader.get_template("polls/homePage.html")
-
-        if order_by == 'alphabetical':
-            # Query to get the count of recipes for each country
-            countries = Recipe.objects.values('country_of_origin')
-
-            # Sort countries in alphabetical order
-            sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
-            
-        elif order_by == 'popularity':
-            # Query to get the count of recipes for each country
-            countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
-
-            # Sort countries in descending order based on recipe count
-            sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
-
-        context = {
-            "countries": [country['country_of_origin'] for country in sorted_countries],
-            "order_by": order_by,
-        }
+    context = {
+        "countries": [country['country_of_origin'] for country in sorted_countries],
+        "order_by": order_by,
+    }
 
     return HttpResponse(template.render(context, request))
 
@@ -71,6 +59,7 @@ def recipe_detail(request, id):
 
 def recipe_list(request):
     template = loader.get_template("polls/recipeList.html")
+    order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
 
     # Sort recipes alphabetically
     sorted_recipes = sorted(Recipe.objects.all(), key=lambda x: x.name)
@@ -81,17 +70,30 @@ def recipe_list(request):
 
     return HttpResponse(template.render(context, request))
 
-def simple_search(request):
-    template = loader.get_template("polls/recipeList.html")
-    query = request.GET.get("query")
+def search(request):
+    template = loader.get_template("polls/searchResults.html")
 
-    sorted_recipes = sorted(Recipe.objects.filter(name=name), key=lambda x: x.name)
+    order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
+    query_string = request.GET.get('query')
+    
+    recipes = Recipe.objects.filter(Q(name__icontains=query_string))
 
-
-    print(request.GET.get("query"))
-    print("enter here!")
     context = {
-        "recipes": sorted_recipes,
+        "recipes": get_sorted_recipes(recipes, order_by),
+        "query": query_string,
+        "order_by": order_by,
     }
 
     return HttpResponse(template.render(context, request))
+
+
+def get_sorted_recipes(recipes, order_by):
+    if order_by == 'alphabetical':
+        return recipes.order_by('-name')
+        
+    elif order_by == 'popularity':
+        return recipes.annotate(recipe_count=Count('id')).order_by('-recipe_count')
+    
+    return None
+     
+

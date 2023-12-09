@@ -126,22 +126,25 @@
 <body>
     <h1>Results</h1>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-        <div class="search-container">
-            <input type="text" class="search-input" name="query" placeholder="Search for recipes...">
-            <button type="submit" class="search-button">Search</button>
-        </div>
-    </div>
+    <div>
+        <form action="{% url 'search' %}" method="get">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <div class="search-container">
+                    <input type="text" class="search-input" name="query" placeholder={{ query }} value={{ query }}>
+                    <button type="submit" class="search-button">Search</button>
+                </div>
+            </div>
 
-    <!-- Order Dropdown -->
-    <div class="order-dropdown">
-        <form action="{% url 'recipes' %}" method="get">
-            <label for="order">Order by:</label>
-            <select id="order" name="order" onchange="this.form.submit()">
-                <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
-                <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
-            </select>
+            <!-- Order Dropdown -->
+            <div class="order-dropdown">
+                    <label for="order">Order by:</label>
+                    <select id="order" name="order" onchange="this.form.submit()">
+                        <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
+                        <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
+                    </select>
+                </form>
+            </div>
         </form>
     </div>
 
