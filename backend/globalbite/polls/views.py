@@ -1,35 +1,45 @@
 from django.http import HttpResponse
 from django.template import loader
-from django.db.models import Count
+from django.db.models import Count, Q
 from .models import Recipe
 import ast
 
 # Create your views here.´
 
 def index(request):
-    template = loader.get_template("polls/homePage.html")
-
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
-    print(order_by)
+    search_recipe = request.GET.get('search')
 
-    if order_by == 'alphabetical':
-        # Query to get the count of recipes for each country
-        countries = Recipe.objects.values('country_of_origin')
-
-        # Sort countries in alphabetical order
-        sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
+    if search_recipe:
+        template = loader.get_template("polls/recipeList.html")
         
-    elif order_by == 'popularity':
-        # Query to get the count of recipes for each country
-        countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
+        recipes = Recipe.objects.filter(Q(name__icontains=search_recipe))
+        context = {
+            "recipes": recipes,
+        }
 
-        # Sort countries in descending order based on recipe count
-        sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
+    else:
 
-    context = {
-        "countries": [country['country_of_origin'] for country in sorted_countries],
-        "order_by": order_by,
-    }
+        template = loader.get_template("polls/homePage.html")
+
+        if order_by == 'alphabetical':
+            # Query to get the count of recipes for each country
+            countries = Recipe.objects.values('country_of_origin')
+
+            # Sort countries in alphabetical order
+            sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
+            
+        elif order_by == 'popularity':
+            # Query to get the count of recipes for each country
+            countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
+
+            # Sort countries in descending order based on recipe count
+            sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
+
+        context = {
+            "countries": [country['country_of_origin'] for country in sorted_countries],
+            "order_by": order_by,
+        }
 
     return HttpResponse(template.render(context, request))
 
@@ -65,6 +75,21 @@ def recipe_list(request):
     # Sort recipes alphabetically
     sorted_recipes = sorted(Recipe.objects.all(), key=lambda x: x.name)
 
+    context = {
+        "recipes": sorted_recipes,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+def simple_search(request):
+    template = loader.get_template("polls/recipeList.html")
+    query = request.GET.get("query")
+
+    sorted_recipes = sorted(Recipe.objects.filter(name=name), key=lambda x: x.name)
+
+
+    print(request.GET.get("query"))
+    print("enter here!")
     context = {
         "recipes": sorted_recipes,
     }
