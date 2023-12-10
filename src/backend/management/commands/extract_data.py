@@ -1,7 +1,7 @@
 # extract_data.py
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.core.management.base import BaseCommand
-from backend.models import Recipe
+from backend.models import Recipe, Country
 
 
 class Command(BaseCommand):
@@ -29,33 +29,42 @@ def dbpedia():
     sparql.setQuery("""
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX dbo: <http://dbpedia.org/ontology/>
-        SELECT ?name ?thumbnail ?countryLabel (GROUP_CONCAT(?ingredientLabel; SEPARATOR=", ") AS ?ingredients) ?abstract
+        SELECT ?name ?thumbnail ?regionLabel ?countryLabel ?countryThumbnail (GROUP_CONCAT(?ingredientLabel; SEPARATOR=", ") AS ?ingredients) ?abstract
         WHERE {
-            ?dish rdf:type dbo:Food ;
+            ?dish rdf:type dbo:Food;
                 rdfs:label ?name ;
                 dbo:country ?country;
+                dbo:region ?region;
                 dbo:ingredient ?ingredient;
                 dbo:abstract ?abstract;
                 dbo:thumbnail ?thumbnail.
-            ?country rdfs:label ?countryLabel.
+            ?country rdfs:label ?countryLabel;
+                dbo:thumbnail ?countryThumbnail.
+            ?region rdfs:label ?regionLabel.
             ?ingredient rdfs:label ?ingredientLabel.
             FILTER(LANG(?name) = "en")
             FILTER(LANG(?countryLabel) = "en")
             FILTER(LANG(?ingredientLabel) = "en")
             FILTER(LANG(?abstract) = "en")
-        } GROUP BY ?dish ?name ?thumbnail ?countryLabel ?abstract
+        } GROUP BY ?dish ?name ?thumbnail ?countryLabel ?countryThumbnail ?abstract
     """)
 
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
 
     for result in results["results"]["bindings"]:
+        print(result["region"]["value"])
         Recipe.objects.create(
             name=result["name"]["value"],
             country_of_origin=result["countryLabel"]["value"],
             ingredients=result["ingredients"]["value"].split(", "),
             abstract=result["abstract"]["value"],
             thumbnail=result["thumbnail"]["value"],
+        )
+
+        Country.objects.get_or_create(
+            name=result["countryLabel"]["value"],
+            thumbnail=result["countryThumbnail"]["value"],
         )
 
 def foodDB():

@@ -1,23 +1,23 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.db.models import Count, Q
-from .models import Recipe
+from .models import Recipe, Country
 import ast
 
 # Create your views here.´
 
 def index(request):
-    print("GET REQUEST:")
-    print(request.GET)
-    order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
+    order_by = request.GET.get('order', 'alphabetical')  # Default to popularity if no order is specified
     template = loader.get_template("homePage.html")
 
     if order_by == 'alphabetical':
         # Query to get the count of recipes for each country
-        countries = Recipe.objects.values('country_of_origin')
+        # countries = Recipe.objects.values('country_of_origin')
 
-        # Sort countries in alphabetical order
-        sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
+        # # Sort countries in alphabetical order
+        # sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
+
+        sorted_countries = sorted(Country.objects.all(), key=lambda country: country.name)
         
     elif order_by == 'popularity':
         # Query to get the count of recipes for each country
@@ -26,8 +26,11 @@ def index(request):
         # Sort countries in descending order based on recipe count
         sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
 
+        sorted_countries = [Country.objects.filter(name=country_name) for country_name in set(sorted_countries)]
+
     context = {
-        "countries": [country['country_of_origin'] for country in sorted_countries],
+        # "countries": [country['country_of_origin'] for country in sorted_countries],
+        "countries": sorted_countries,
         "order_by": order_by,
     }
 
@@ -38,7 +41,7 @@ def country_recipes(request, country):
 
     # Sort recipes alphabetically
     sorted_recipes = sorted(Recipe.objects.filter(country_of_origin=country), key=lambda x: x.name)
-    
+
     context = {
         "recipes": sorted_recipes,
     }
@@ -78,7 +81,6 @@ def search(request):
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
     name = request.GET.get('name')
     if name is not None:
-        print("HERE :)")
         recipes = Recipe.objects.filter(Q(name__icontains=name))
 
     # Advanced search
@@ -86,11 +88,9 @@ def search(request):
     abstract = request.GET.get('details')
 
     if country_of_origin is not None:
-        print("HERE :)")
         recipes = Recipe.objects.filter(Q(country_of_origin__icontains=country_of_origin))
 
     if abstract is not None:
-        print("HERE :)")
         recipes = Recipe.objects.filter(Q(abstract__icontains=abstract))
     
 

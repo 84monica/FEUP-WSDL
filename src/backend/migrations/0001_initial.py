@@ -22,4 +22,13 @@ class Migration(migrations.Migration):
                 ('thumbnail', models.ImageField(upload_to=None, default="")),
             ],
         ),
+
+        migrations.CreateModel(
+            name='Country',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=255)),
+                ('thumbnail', models.ImageField(upload_to=None, default="")),
+            ],
+        )
     ]
