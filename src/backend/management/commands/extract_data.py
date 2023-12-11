@@ -29,7 +29,7 @@ def dbpedia():
     sparql.setQuery("""
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX dbo: <http://dbpedia.org/ontology/>
-        SELECT ?name ?thumbnail ?regionLabel ?countryLabel ?countryThumbnail (GROUP_CONCAT(?ingredientLabel; SEPARATOR=", ") AS ?ingredients) ?abstract
+        SELECT ?name ?thumbnail ?countryLabel ?countryThumbnail (GROUP_CONCAT(?ingredientLabel; SEPARATOR=", ") AS ?ingredients) ?abstract
         WHERE {
             ?dish rdf:type dbo:Food;
                 rdfs:label ?name ;
@@ -40,7 +40,6 @@ def dbpedia():
                 dbo:thumbnail ?thumbnail.
             ?country rdfs:label ?countryLabel;
                 dbo:thumbnail ?countryThumbnail.
-            ?region rdfs:label ?regionLabel.
             ?ingredient rdfs:label ?ingredientLabel.
             FILTER(LANG(?name) = "en")
             FILTER(LANG(?countryLabel) = "en")
