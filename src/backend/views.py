@@ -102,8 +102,12 @@ def recipe_detail(request, id):
     #  Convert ingredients from string to list
     recipe.ingredients = ast.literal_eval(recipe.ingredients)
 
+    # Get country info
+    country = Country.objects.get(name=recipe.country_of_origin)
+
     context = {
         "recipe": recipe,
+        "country": country
     }
 
     return HttpResponse(template.render(context, request))

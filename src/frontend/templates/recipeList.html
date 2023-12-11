@@ -68,7 +68,7 @@
                             <img class="card-img-top" src="{{ recipe.thumbnail }}" alt="{{ recipe.name }}">
                         </div>
                         <div class="card-footer text-center">
-                            <form method="get">
+                            <form method="get" action="{% url 'recipe_detail' recipe.id %}">
                                 <button class="btn btn-success" type="submit">View Details</button>
                             </form>
                         </div>
