@@ -195,20 +195,15 @@
     </div>
 
     <!-- Order Dropdown -->
-    <div class="dropdown">
-        <form action="{% url 'index' %}" method="get">
-            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Order by</button>
-            <div class="dropdown-menu">
-                <button class="dropdown-item" type="submit">Popularity</a>
-                <button class="dropdown-item" type="submit ">Alphabetical</a>
-            </div>
-                {% comment %} <label for="order">Order by:</label>
-                <select id="order" name="order" onchange="this.form.submit()">
-                    <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
-                    <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
-                </select> {% endcomment %}
-        </form>
-    </div>
+    <form class="form-inline row justify-content-center mt-4 mb-4" action="{% url 'index' %}" method="get">
+        <div class="form-group no-gutters">
+            <label for="order" class="form-control bg-success no-border text-white m-0">Order by</label>
+            <select class="form-control" id="order" name="order" onchange="this.form.submit()">
+                <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
+                <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
+            </select>
+        </div>
+    </form>
     
 
     <!-- Country Cards -->

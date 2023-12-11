@@ -7,16 +7,10 @@ import ast
 # Create your views here.´
 
 def index(request):
-    order_by = request.GET.get('order', 'alphabetical')  # Default to popularity if no order is specified
+    order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
     template = loader.get_template("homePage.html")
 
     if order_by == 'alphabetical':
-        # Query to get the count of recipes for each country
-        # countries = Recipe.objects.values('country_of_origin')
-
-        # # Sort countries in alphabetical order
-        # sorted_countries = sorted(countries, key=lambda x: x['country_of_origin'])
-
         sorted_countries = sorted(Country.objects.all(), key=lambda country: country.name)
         
     elif order_by == 'popularity':
@@ -24,12 +18,10 @@ def index(request):
         countries_with_counts = Recipe.objects.values('country_of_origin').annotate(recipe_count=Count('id'))
 
         # Sort countries in descending order based on recipe count
-        sorted_countries = sorted(countries_with_counts, key=lambda x: x['recipe_count'], reverse=True)
-
-        sorted_countries = [Country.objects.filter(name=country_name) for country_name in set(sorted_countries)]
+        sorted_countries = sorted(countries_with_counts, key=lambda country: country['recipe_count'], reverse=True)
+        sorted_countries = set([Country.objects.get(name=country["country_of_origin"]) for country in sorted_countries])
 
     context = {
-        # "countries": [country['country_of_origin'] for country in sorted_countries],
         "countries": sorted_countries,
         "order_by": order_by,
     }
