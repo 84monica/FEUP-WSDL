@@ -43,30 +43,30 @@
     </nav>
 
     <div class="container">
-        <div class="row justify-content-md-center">
-            <div class="col w-100 h-100 ">
-                <h1 class="text-center">{{ recipe.name }}</h1>
-                <img class="img-thumbnail mx-auto d-block" src="{{ recipe.thumbnail }}" alt="{{ recipe.name }}">
+        <div class="col">
+            <h1 class="text-center mb-4">{{ recipe.name }}</h1>
+            <img class="img-thumbnail mx-auto d-block mb-4" src="{{ recipe.thumbnail }}" alt="{{ recipe.name }}">
+            <div class="container">
+                <h5 class="mb-2">Country of Origin</h5>
+                <figure class="figure ml-4">
+                    <img class="figure-img img-fluid" src="{{ country.thumbnail }}" alt="{{ country.name }}">
+                    <figcaption class="figure-caption text-center">{{ country.name }}</figcaption>
+                </figure>
             </div>
-            <div class="col align-self-center">
-                <div class="container mb-10">
-                    <img class="img-thumbnail mx-auto d-block w-25" src="{{ country.thumbnail }}" alt="{{ country.name }}">
-                    <p class="text-center">{{ country.name }}</p>
-                </div>
-                <div class="container mb-4">
-                    <h5>Ingredients</h5>
-                    <ul class="list-group">
-                        {% for ingredient in recipe.ingredients %}
-                            <li class="list-group-item">{{ ingredient }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
 
-                <div class="container">
-                    <h5>Details</h5>
-                    {{ recipe.abstract }}
-                </div>
-            </div
+            <div class="container mb-4">
+                <h5>Ingredients</h5>
+                <ul class="list-group">
+                    {% for ingredient in recipe.ingredients %}
+                        <li class="list-group-item">{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="container mb-4">
+                <h5>Details</h5>
+                {{ recipe.abstract }}
+            </div>
         </div>
     </div>
 </body>
