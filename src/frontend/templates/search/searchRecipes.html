@@ -22,60 +22,59 @@
         <ul class="navbar-nav mr-auto">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <form>
+                    <form action="{% url 'recipes' %}" method="get">
+                        <button class="btn btn-success" type="submit">Recipes</button>
+                    </form>
+                </li>
+                <li class="nav-item active">
+                    <form action="{% url 'search_recipes_page' %}" method="get">
                         <button class="btn btn-success" type="submit">Search Recipes</button>
                     </form>
                 </li>
                 <li class="nav-item active">
-                    <form>
+                    <form action="{% url 'search_by_country_page' %}" method="get">
                         <button class="btn btn-success" type="submit">Search by Country</button>
                     </form>
                 </li>
                 <li class="nav-item active">
-                    <form>
+                    <form action="{% url 'search_by_ingredient_page' %}" method="get">
                         <button class="btn btn-success" type="submit">Search by Ingredient</button>
                     </form>
                 </li>
             </ul>
         </ul>
-        
-        <!-- Order Dropdown -->
-        <form class="form-inline mr-4" action="{% url 'index' %}" method="get">
-            <div class="form-group no-gutters">
-                <label for="order" class="form-control bg-success border-0 text-white mr-sm-2">Order by</label>
-                <select class="form-control my-2 my-sm-0" id="order" name="order" onchange="this.form.submit()">
-                    <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
-                    <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
-                </select>
-            </div>
-        </form>
     </nav>
 
     <!-- Search form -->
     <div class="row justify-content-center mb-4">
         <form class="form-inline" action="{% url 'search' %}" method="get">
             <div class="form-group no-gutters">
-                <input class="form-control" name="name" type="text" placeholder="Search Recipes" aria-label="Search">
+                {% if name != None %}
+                    <input class="form-control" name="name" type="text" placeholder="{{ name }}" value="{{ name }}" aria-label="Search">
+                {% else %}
+                    <input class="form-control" name="name" type="text" placeholder="Search recipes" aria-label="Search">
+                {% endif %}
                 <button class="btn btn-success text-white">Search</button>
             </div>
         </form>
     </div>
 
-    <!-- Country Cards -->
+    <!-- Recipes Cards -->
     <div class="container">
-        <div class="row g-4">
-            {% for country in countries %}
+        <div class="row justify-content-center g-4">
+            {% for recipe in recipes %}
                 <div class="col-4" style="margin-bottom: 20px;">
                     <div class="card h-100">
                         <div class="card-header text-center">
-                            <h5 class="card-title">{{ country.name }}</h5>
+                            <h3 class="card-title">{{ recipe.name }}</h3>
+                            <p>{{ recipe.country_of_origin }}</p>
                         </div>
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            <img class="card-img-top" src="{{ country.thumbnail }}" alt="{{ country.name }}">
+                        <div class="card-body ">
+                            <img class="card-img-top" src="{{ recipe.thumbnail }}" alt="{{ recipe.name }}">
                         </div>
                         <div class="card-footer text-center">
-                            <form action="{% url 'country_recipes' country.name %}" method="get">
-                                <button class="btn btn-success" type="submit">Show Recipes</button>
+                            <form method="get">
+                                <button class="btn btn-success" type="submit">View Details</button>
                             </form>
                         </div>
                     </div>

@@ -21,7 +21,10 @@ def search_recipes_page(request):
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
     template = loader.get_template("search/searchRecipes.html")
 
+    search_results = get_searched_recipes(request)
+
     context = {
+        "recipes": get_sorted_recipes(search_results["recipes"], order_by),
         "countries": get_all_sorted_countries(order_by),
         "order_by": order_by,
     }
@@ -32,7 +35,10 @@ def search_by_country_page(request):
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
     template = loader.get_template("search/searchByCountry.html")
 
+    search_results = get_searched_recipes(request)
+
     context = {
+        "recipes": get_sorted_recipes(search_results["recipes"], order_by),
         "countries": get_all_sorted_countries(order_by),
         "order_by": order_by,
     }
@@ -43,7 +49,10 @@ def search_by_ingredient_page(request):
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
     template = loader.get_template("search/searchByIngredient.html")
 
+    search_results = get_searched_recipes(request)
+
     context = {
+        "recipes": get_sorted_recipes(search_results["recipes"], order_by),
         "countries": get_all_sorted_countries(order_by),
         "order_by": order_by,
     }
@@ -52,31 +61,15 @@ def search_by_ingredient_page(request):
 
 def search(request):
     template = loader.get_template("search/searchResults.html")
-
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
-    name = request.GET.get('name')
-    print("NAME: " + name)
-    if name is not None:
-        recipes = Recipe.objects.filter(Q(name__icontains=name))
 
-    # Search by country of origin
-    country_of_origin = request.GET.get('country_of_origin')
-
-    if country_of_origin is not None:
-        recipes = Recipe.objects.filter(Q(country_of_origin__icontains=country_of_origin))
-
-    # Search by ingredient
-    ingredient = request.GET.get('ingredient')
-
-    if ingredient is not None:
-        recipes = Recipe.objects.filter(Q(ingredients__icontains=ingredient))
+    search_results = get_searched_recipes(request)
     
-
     context = {
-        "recipes": get_sorted_recipes(recipes, order_by),
-        "name": name,
-        "country_of_origin": country_of_origin,
-        "ingredient": ingredient,
+        "recipes": get_sorted_recipes(search_results["recipes"], order_by),
+        "name": search_results["name"],
+        "country_of_origin": search_results["country_of_origin"],
+        "ingredient": search_results["ingredient"],
         "order_by": order_by,
     }
 
@@ -116,19 +109,41 @@ def recipe_list(request):
     template = loader.get_template("recipeList.html")
     order_by = request.GET.get('order', 'popularity')  # Default to popularity if no order is specified
 
-    # Sort recipes alphabetically
-    sorted_recipes = sorted(Recipe.objects.all(), key=lambda x: x.name)
-
     context = {
-        "recipes": sorted_recipes,
+        "recipes": get_sorted_recipes(Recipe.objects.all(), order_by),
+        "order_by": order_by,
     }
 
     return HttpResponse(template.render(context, request))
 
+def get_searched_recipes(request):
+    recipes = Recipe.objects.all()
+    
+    # Simple search
+    name = request.GET.get('name')
+    if name is not None:
+        recipes = Recipe.objects.filter(Q(name__icontains=name))
+
+    # Search by country of origin
+    country_of_origin = request.GET.get('country_of_origin')
+    if country_of_origin is not None:
+        recipes = Recipe.objects.filter(Q(country_of_origin__icontains=country_of_origin))
+
+    # Search by ingredient
+    ingredient = request.GET.get('ingredient')
+    if ingredient is not None:
+        recipes = Recipe.objects.filter(Q(ingredients__icontains=ingredient))
+
+    return {
+        "recipes": recipes,
+        "name": name,
+        "country_of_origin": country_of_origin,
+        "ingredient": ingredient,
+    }
 
 def get_sorted_recipes(recipes, order_by):
     if order_by == 'alphabetical':
-        return recipes.order_by('-name')
+        return sorted(recipes, key=lambda recipe: recipe.name)
         
     elif order_by == 'popularity':
         return recipes.annotate(recipe_count=Count('id')).order_by('-recipe_count')

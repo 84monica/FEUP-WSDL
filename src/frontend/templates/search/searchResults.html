@@ -24,6 +24,11 @@
         <ul class="navbar-nav mr-auto">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
+                    <form action="{% url 'recipes' %}" method="get">
+                        <button class="btn btn-success" type="submit">Recipes</button>
+                    </form>
+                </li>
+                <li class="nav-item active">
                     <form action="{% url 'search_recipes_page' %}" method="get">
                         <button class="btn btn-success" type="submit">Search Recipes</button>
                     </form>
@@ -40,17 +45,6 @@
                 </li>
             </ul>
         </ul>
-        
-        <!-- Order Dropdown -->
-        <form class="form-inline mr-4" action="{% url 'search' %}" method="get">
-                <div class="form-group no-gutters">
-                    <label for="order" class="form-control bg-success border-0 text-white mr-sm-2">Order by</label>
-                    <select class="form-control my-2 my-sm-0" id="order" name="order" onchange="this.form.submit()">
-                        <option value="popularity" {% if order_by == 'popularity' %} selected {% endif %}>Popularity</option>
-                        <option value="alphabetical" {% if order_by == 'alphabetical' %} selected {% endif %}>Alphabetical</option>
-                    </select>
-                </div>
-        </form>
     </nav>
 
     <!-- Search form -->
@@ -82,7 +76,7 @@
                             <img class="card-img-top" src="{{ recipe.thumbnail }}" alt="{{ recipe.name }}">
                         </div>
                         <div class="card-footer text-center">
-                            <form method="get">
+                            <form method="get" action="{% url 'recipe_detail' recipe.id %}">
                                 <button class="btn btn-success" type="submit">View Details</button>
                             </form>
                         </div>
