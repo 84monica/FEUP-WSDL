@@ -1,0 +1,73 @@
+<!-- templates/recipes/recipe_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe.name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fa/css/all.min.css' %}">
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-success row justify-content-center mb-4">
+        <form action="{% url 'index' %}" method="get">
+            <button class="btn btn-sucess navbar-brand border-0" type="submit">
+                <h1 class="text-white">GlobalBite</h1>
+            </button>
+        </form>
+
+        <!-- Search -->
+        <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <form action="{% url 'search_recipes_page' %}" method="get">
+                        <button class="btn btn-success" type="submit">Search Recipes</button>
+                    </form>
+                </li>
+                <li class="nav-item active">
+                    <form action="{% url 'search_by_country_page' %}" method="get">
+                        <button class="btn btn-success" type="submit">Search by Country</button>
+                    </form>
+                </li>
+                <li class="nav-item active">
+                    <form action="{% url 'search_by_ingredient_page' %}" method="get">
+                        <button class="btn btn-success" type="submit">Search by Ingredient</button>
+                    </form>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="col">
+            <h1 class="text-center mb-4">{{ recipe.name }}</h1>
+            <img class="img-thumbnail mx-auto d-block mb-4" src="{{ recipe.thumbnail }}" alt="{{ recipe.name }}">
+            <div class="container">
+                <h5 class="mb-2">Country of Origin</h5>
+                <figure class="figure ml-4">
+                    <img class="figure-img img-fluid" src="{{ country.thumbnail }}" alt="{{ country.name }}">
+                    <figcaption class="figure-caption text-center">{{ country.name }}</figcaption>
+                </figure>
+            </div>
+
+            <div class="container mb-4">
+                <h5>Ingredients</h5>
+                <ul class="list-group">
+                    {% for ingredient in recipe.ingredients %}
+                        <li class="list-group-item">{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="container mb-4">
+                <h5>Details</h5>
+                {{ recipe.abstract }}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
